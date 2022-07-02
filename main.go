@@ -90,6 +90,24 @@ func getAlbumByID(c *gin.Context) {
 
 }
 
+func deleteAlbumByID(c *gin.Context) {
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		panic(err.Error())
+	}
+
+	sql := fmt.Sprintf("DELETE FROM articles where id=%d", id)
+	_, err = dbClient.Exec(sql)
+
+	if err != nil {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"message": err.Error()})
+		panic(err.Error())
+	}
+
+	c.IndentedJSON(http.StatusOK, gin.H{"message": "Successfully Deleted."})
+
+}
+
 func main() {
 	dbConnect()
 	routers()
@@ -100,6 +118,7 @@ func routers() {
 	router.GET("/albums", getAlbums)
 	router.GET("/albums/:id", getAlbumByID)
 	router.POST("/albums", postAlbums)
+	router.POST("/albums/delete/:id", deleteAlbumByID)
 
 	router.Run("localhost:8080")
 }
